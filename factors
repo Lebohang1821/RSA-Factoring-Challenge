@@ -1,0 +1,66 @@
+#!/usr/bin/python3
+import math
+import sys
+import time
+
+def pollard_rho(n):
+    if n % 2 == 0:
+        return 2
+    
+    v = 2
+    k = 2
+    p = 1 
+    """ It defines function f(v) using lambda function."""
+    f = lambda v: (v**2 + 1) % n
+    """It loops until non-trivial factor is found."""
+    while p == 1:
+        """ It generates values for v using function f(v)"""
+        x = f(v)
+	
+        """ It generate values for k using function f(f(k))"""
+        y = f(f(k))
+        """ It calculates greatest common divisor between |v - k| and n"""
+        p = math.gcd(abs(v - k), n)
+    """ Returns non-trivial factor"""
+    return (p)
+
+def main():
+    """ It check if correct number of command-line arguments is provided"""
+    if len(sys.argv) != 2:
+        """ It prints correct usage of program"""
+        print("Usage: python factorize.py <file>")
+        """ It exit program if correct arguments are not provided"""
+        return
+    """ It gets file path from its command-line argument"""
+    file_path = sys.argv[1]
+    """ Start timing"""
+    start_time = time.time()
+    try:
+        """ It opens file in read mode"""
+        with open(file_path, 'r') as file:
+	""" It reads all lines of file into list"""
+            numbers = file.readlines()
+        """ It terate through each number in list"""
+        for number in numbers:
+	""" It converts string number to integer"""
+            num = int(number.strip())
+	""" It factorize number using Pollard's rho algorithm"""
+            factor = pollard_rho(num)
+            """ If factor is equal to original number"""
+            if factor == num:
+                """ It prints number of prime"""
+                print(f"{num} is prime.")
+            else:
+	    """ It prints factors of number"""
+                print(f"{num}={factor}*{num // factor}")
+
+	if time.time() - start_time > 5:
+                print("Time limit exceeded")
+                exit()
+
+    """ It prints error message if file is not found"""
+    except FileNotFoundError:
+        print(f"File '{file_path}' not found.")
+
+if __name__ == '__main__':
+    main()  """ It calls main function when script is executed"""
