@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     try:
         with open(input_file, 'r') as f:
-            lines = f.readlines()
+            lines = f.read().splitlines()
     except FileNotFoundError:
         print("File not found")
         sys.exit(1)
@@ -35,11 +35,16 @@ if __name__ == "__main__":
     start_time = time.time()
 
     for line in lines:
+        # Check for empty or whitespace-only lines
+        if not line.strip():
+            continue
+
         num = int(line.strip())
         factors = factorize(num)
         if factors:
             print(f"{num}={factors[0]}*{factors[1]}")
 
+        # Check if the elapsed time exceeds 5 seconds
         if time.time() - start_time > 5:
             print("Time limit exceeded")
             sys.exit(1)
