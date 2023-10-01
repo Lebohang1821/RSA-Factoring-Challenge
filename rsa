@@ -1,48 +1,52 @@
 #!/usr/bin/env bash
-#is a challenge
-check_factor()
-{
-	if [ $# -ne 3 ];
-        then
-                args=("$@")
-                count=0
-                num2=1
-                for a in ${args[*]};
-                do
-                        if [ $count -gt 1 ];
-                        then
-                                num2=$(echo $a*$num2 | bc)
-                        fi
-                        count=$((count + 1))
-                done
-        else
-                num2=$3
-        fi
+# The _RSA_ Challenge
 
-        num1=$2
-        num=$(echo "$1" | tr ':' '=')
+# It defins function called check_factor
+check_factor() {
+    # It checks if number of arguments is not equal to 3
+    if [ $# -ne 3 ]; then
+        my_args=("$@")
+        my_count=0
+        num2=1
+        # Iterate through the arguments
+        for a in ${my_args[*]}; do
+            if [ $my_count -gt 1 ]; then
+                num2=$(echo $a*$num2 | bc)  # Calculate the product of all arguments except the first two
+            fi
+            my_count=$((my_count + 1))
+        done
+    else
+        num2=$3  # If three arguments are provided, assign the third argument to num2
+    fi
 
-        result=$(echo "if($num2 > $num1) 1 else 0" | bc)
-	        if ((result == 1)); then
-		        numcp=$num1
-		        num1=$num2
-		        num2=$numcp
-                fi
+    num1=$2  # Assign the second argument to num1
+    num=$(echo "$1" | tr ':' '=')  # Transform the first argument into an equality comparison
 
-        echo "$num$num1*$num2"
+    # Compare num2 and num1 using bc and store the result in the 'result' variable
+    result=$(echo "if($num2 > $num1) 1 else 0" | bc)
+
+    # If result is 1, swap num1 and num2
+    if ((result == 1)); then
+        numcp=$num1
+        num1=$num2
+        num2=$numcp
+    fi
+
+    # Echo a string that combines transformed num, num1, and num2
+    echo "$num$num1*$num2"
 }
 
-if [ $# -ne 1 ]
-then
-        echo 'Usage: rsa <file>'
-        exit 1
+# It check number of command-line arguments
+if [ $# -ne 1 ]; then
+    echo 'Usage: rsa <file>'
+    exit 1
 else
-
-        while read i
-        do
-
-                result=$(factor "$i")
-                check_factor $result
-
-        done < "$1"
+    # It read input fro file specified as first command-line argument
+    while read i; do
+        # It calculate prime factors of 'i' using 'factor' command
+        result=$(factor "$i")
+        
+        # Calls check_factor function with result
+        check_factor $result
+    done < "$1"
 fi
