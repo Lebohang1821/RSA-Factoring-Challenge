@@ -1,48 +1,49 @@
-#!/usr/bin/python3
+#!/usr/bin/env bash
+# is a factors challenge
 
-import sys
-import time
+check_factor()
+{
+	if [ $# -ne 3 ];
+        then
+                args=("$@")
+                count=0
+                num2=1
+                for a in ${args[*]};
+                do
+                        if [ $count -gt 1 ];
+                        then
+                                num2=$(echo $a*$num2 | bc)
+                        fi
+                        count=$((count + 1))
+                done
+        else
+                num2=$3
+        fi
 
-def factorize(num):
-    '''
-    Factorize a number into two smaller factors.
+        num1=$2
+        num=$(echo "$1" | tr ':' '=')
 
-    Args:
-        num (int): The input integer to factorize.
+        result=$(echo "if($num2 > $num1) 1 else 0" | bc)
+	        if ((result == 1)); then
+		        numcp=$num1
+		        num1=$num2
+		        num2=$numcp
+                fi
 
-    Returns:
-        tuple: A tuple of two factors if the number is not a prime, otherwise None.
-    '''
-    for i in range(2, int(num ** 0.5) + 1):
-        if num % i == 0:
-            return (i, num // i)
-    return None
+        echo "$num$num1*$num2"
+}
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: factors <file>")
-        sys.exit(1)
+if [ $# -ne 1 ]
+then
+        echo 'Usage: factors <file>'
+        exit 1
+else
 
-    input_file = sys.argv[1]
+        while read i
+        do
 
-    try:
-        with open(input_file, 'r') as f:
-            lines = f.readlines()
-    except FileNotFoundError:
-        print("File not found")
-        sys.exit(1)
+                result=$(factor "$i")
+                check_factor $result
 
-    start_time = time.time()
-
-    for line in lines:
-        try:
-            num = int(line.strip())
-            factors = factorize(num)
-            if factors:
-                print(f"{num}={factors[0]}*{factors[1]}")
-        except ValueError:
-            print(f"Invalid input: {line.strip()}")
-
-        if time.time() - start_time > 5:
-            print("Time limit exceeded")
-            sys.exit(1)
+        done < "$1"
+fi
